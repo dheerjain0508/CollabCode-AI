@@ -35,10 +35,11 @@ function Profile() {
 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  
+
   const [skillName, setSkillName] = useState('');
   const [skillLevel, setSkillLevel] = useState('BEGINNER');
   const [addingSkill, setAddingSkill] = useState(false);
+
   useEffect(() => {
     async function fetchProfile() {
       try {
@@ -74,11 +75,8 @@ function Profile() {
         const data: User = await response.json();
 
         setUser(data);
-
         setBio(data.profile?.bio ?? '');
-        setExperienceLevel(
-          data.profile?.experienceLevel ?? '',
-        );
+        setExperienceLevel(data.profile?.experienceLevel ?? '');
         setGithubUrl(data.profile?.githubUrl ?? '');
         setPortfolioUrl(data.profile?.portfolioUrl ?? '');
       } catch (err) {
@@ -95,7 +93,7 @@ function Profile() {
     fetchProfile();
   }, []);
 
-  async function handleSubmit(event: any) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setError('');
@@ -118,11 +116,9 @@ function Profile() {
         {
           method: 'PATCH',
           credentials: 'include',
-
           headers: {
             'Content-Type': 'application/json',
           },
-
           body: JSON.stringify({
             bio: bio || null,
             experienceLevel: experienceLevel || null,
@@ -162,291 +158,330 @@ function Profile() {
       setSaving(false);
     }
   }
-  async function handleAddSkill(event: any) {
-  event.preventDefault();
 
-  setError('');
-  setMessage('');
+  async function handleAddSkill(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
 
-  if (!skillName.trim()) {
-    setError('Skill name is required.');
-    return;
-  }
+    setError('');
+    setMessage('');
 
-  if (!user) {
-    setError('User not found.');
-    return;
-  }
-
-  try {
-    setAddingSkill(true);
-
-    const response = await fetch(
-      `http://localhost:3000/users/${user.id}/skills`,
-      {
-        method: 'POST',
-
-        credentials: 'include',
-
-        headers: {
-          'Content-Type': 'application/json',
-        },
-
-        body: JSON.stringify({
-          name: skillName.trim(),
-          level: skillLevel,
-        }),
-      },
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || 'Failed to add skill',
-      );
+    if (!skillName.trim()) {
+      setError('Skill name is required.');
+      return;
     }
 
-    setUser((currentUser) => {
-      if (!currentUser) {
-        return currentUser;
+    if (!user) {
+      setError('User not found.');
+      return;
+    }
+
+    try {
+      setAddingSkill(true);
+
+      const response = await fetch(
+        `http://localhost:3000/users/${user.id}/skills`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: skillName.trim(),
+            level: skillLevel,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || 'Failed to add skill',
+        );
       }
 
-      const existingSkillIndex =
-        currentUser.skills.findIndex(
-          (item) => item.skill.id === data.skill.id,
-        );
+      setUser((currentUser) => {
+        if (!currentUser) {
+          return currentUser;
+        }
 
-      if (existingSkillIndex !== -1) {
-        const updatedSkills = [...currentUser.skills];
+        const existingSkillIndex =
+          currentUser.skills.findIndex(
+            (item) => item.skill.id === data.skill.id,
+          );
 
-        updatedSkills[existingSkillIndex] = data;
+        if (existingSkillIndex !== -1) {
+          const updatedSkills = [...currentUser.skills];
+          updatedSkills[existingSkillIndex] = data;
+
+          return {
+            ...currentUser,
+            skills: updatedSkills,
+          };
+        }
 
         return {
           ...currentUser,
-          skills: updatedSkills,
+          skills: [...currentUser.skills, data],
         };
-      }
+      });
 
-      return {
-        ...currentUser,
-        skills: [...currentUser.skills, data],
-      };
-    });
-
-    setSkillName('');
-    setSkillLevel('BEGINNER');
-
-    setMessage('Skill added successfully!');
-  } catch (err) {
-    setError(
-      err instanceof Error
-        ? err.message
-        : 'Something went wrong',
-    );
-  } finally {
-    setAddingSkill(false);
+      setSkillName('');
+      setSkillLevel('BEGINNER');
+      setMessage('Skill added successfully!');
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Something went wrong',
+      );
+    } finally {
+      setAddingSkill(false);
+    }
   }
-}
+
   if (loading) {
-    return <h1>Loading profile...</h1>;
+    return (
+      <main className="profile-page">
+        <p className="loading-text">Loading profile...</p>
+      </main>
+    );
   }
 
   if (error && !user) {
-    return <h1>Error: {error}</h1>;
+    return (
+      <main className="profile-page">
+        <div className="profile-message error">
+          Error: {error}
+        </div>
+      </main>
+    );
   }
 
   if (!user) {
-    return <h1>Profile not found</h1>;
+    return (
+      <main className="profile-page">
+        <div className="profile-message">
+          Profile not found
+        </div>
+      </main>
+    );
   }
 
   return (
-    <div>
-      <h1>My Profile</h1>
+    <main className="profile-page">
+      <div className="profile-container">
 
-      <h2>{user.name || 'Unnamed User'}</h2>
+        <header className="profile-header">
+          <p className="profile-eyebrow">
+            COLLABCODE • DEVELOPER PROFILE
+          </p>
 
-      <p>
-        <strong>Email:</strong> {user.email}
-      </p>
+          <h1>My Profile</h1>
 
-      <hr />
+          <p className="profile-subtitle">
+            Manage your developer information, experience,
+            and skills.
+          </p>
+        </header>
 
-      <h2>Edit Profile</h2>
+        <section className="profile-card profile-overview">
+          <div className="profile-avatar">
+            {user.name?.charAt(0).toUpperCase() || '?'}
+          </div>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Bio</label>
+          <div>
+            <h2>{user.name || 'Unnamed User'}</h2>
+            <p>{user.email}</p>
+          </div>
+        </section>
 
-          <br />
+        <section className="profile-card">
+          <div className="section-heading">
+            <span>01</span>
+            <div>
+              <h2>Profile Information</h2>
+              <p>Tell other developers a little about yourself.</p>
+            </div>
+          </div>
 
-          <textarea
-            value={bio}
-            onChange={(event) =>
-              setBio(event.target.value)
-            }
-            placeholder="Tell other developers about yourself..."
-            rows={5}
-          />
-
-          <br />
-
-          <small>{bio.length}/500 characters</small>
-        </div>
-
-        <br />
-
-        <div>
-          <label>Experience Level</label>
-
-          <br />
-
-          <select
-            value={experienceLevel}
-            onChange={(event) =>
-              setExperienceLevel(event.target.value)
-            }
+          <form
+            className="profile-form"
+            onSubmit={handleSubmit}
           >
-            <option value="">Select level</option>
-            <option value="BEGINNER">Beginner</option>
-            <option value="INTERMEDIATE">
-              Intermediate
-            </option>
-            <option value="ADVANCED">Advanced</option>
-            <option value="EXPERT">Expert</option>
-          </select>
-        </div>
+            <div className="form-group">
+              <label htmlFor="bio">Bio</label>
 
-        <br />
+              <textarea
+                id="bio"
+                value={bio}
+                onChange={(event) =>
+                  setBio(event.target.value)
+                }
+                placeholder="Tell other developers about yourself..."
+                rows={5}
+              />
 
-        <div>
-          <label>GitHub URL</label>
+              <small>{bio.length}/500 characters</small>
+            </div>
 
-          <br />
+            <div className="form-group">
+              <label htmlFor="experience">
+                Experience Level
+              </label>
 
-          <input
-            type="url"
-            value={githubUrl}
-            onChange={(event) =>
-              setGithubUrl(event.target.value)
-            }
-            placeholder="https://github.com/username"
-          />
-        </div>
+              <select
+                id="experience"
+                value={experienceLevel}
+                onChange={(event) =>
+                  setExperienceLevel(event.target.value)
+                }
+              >
+                <option value="">Select level</option>
+                <option value="BEGINNER">Beginner</option>
+                <option value="INTERMEDIATE">
+                  Intermediate
+                </option>
+                <option value="ADVANCED">Advanced</option>
+                <option value="EXPERT">Expert</option>
+              </select>
+            </div>
 
-        <br />
+            <div className="form-group">
+              <label htmlFor="github">GitHub URL</label>
 
-        <div>
-          <label>Portfolio URL</label>
+              <input
+                id="github"
+                type="url"
+                value={githubUrl}
+                onChange={(event) =>
+                  setGithubUrl(event.target.value)
+                }
+                placeholder="https://github.com/username"
+              />
+            </div>
 
-          <br />
+            <div className="form-group">
+              <label htmlFor="portfolio">
+                Portfolio URL
+              </label>
 
-          <input
-            type="url"
-            value={portfolioUrl}
-            onChange={(event) =>
-              setPortfolioUrl(event.target.value)
-            }
-            placeholder="https://yourportfolio.com"
-          />
-        </div>
+              <input
+                id="portfolio"
+                type="url"
+                value={portfolioUrl}
+                onChange={(event) =>
+                  setPortfolioUrl(event.target.value)
+                }
+                placeholder="https://yourportfolio.com"
+              />
+            </div>
 
-        <br />
+            <button
+              className="profile-button"
+              type="submit"
+              disabled={saving}
+            >
+              {saving ? 'Saving...' : 'Save Profile'}
+            </button>
+          </form>
+        </section>
 
-        <button type="submit" disabled={saving}>
-          {saving ? 'Saving...' : 'Save Profile'}
-        </button>
-      </form>
+        <section className="profile-card">
+          <div className="section-heading">
+            <span>02</span>
+            <div>
+              <h2>Skills</h2>
+              <p>Add the technologies you work with.</p>
+            </div>
+          </div>
 
-      {message && (
-        <p>
-          <strong>{message}</strong>
-        </p>
-      )}
+          <form
+            className="skill-form"
+            onSubmit={handleAddSkill}
+          >
+            <div className="form-group">
+              <label htmlFor="skillName">
+                Skill Name
+              </label>
 
-      {error && (
-        <p>
-          <strong>Error: {error}</strong>
-        </p>
-      )}
+              <input
+                id="skillName"
+                type="text"
+                value={skillName}
+                onChange={(event) =>
+                  setSkillName(event.target.value)
+                }
+                placeholder="e.g. React"
+              />
+            </div>
 
-      <hr />
+            <div className="form-group">
+              <label htmlFor="skillLevel">
+                Skill Level
+              </label>
 
-      <h2>Skills</h2>
+              <select
+                id="skillLevel"
+                value={skillLevel}
+                onChange={(event) =>
+                  setSkillLevel(event.target.value)
+                }
+              >
+                <option value="BEGINNER">Beginner</option>
+                <option value="INTERMEDIATE">
+                  Intermediate
+                </option>
+                <option value="ADVANCED">Advanced</option>
+                <option value="EXPERT">Expert</option>
+              </select>
+            </div>
 
-<form onSubmit={handleAddSkill}>
-  <div>
-    <label>Skill Name</label>
+            <button
+              className="profile-button"
+              type="submit"
+              disabled={addingSkill}
+            >
+              {addingSkill ? 'Adding...' : 'Add Skill'}
+            </button>
+          </form>
 
-    <br />
+          <div className="skills-list">
+            {user.skills.length === 0 ? (
+              <p className="empty-skills">
+                No skills added yet.
+              </p>
+            ) : (
+              user.skills.map((item) => (
+                <div
+                  className="skill-item"
+                  key={item.skill.id}
+                >
+                  <strong>{item.skill.name}</strong>
+                  <span>
+                    {item.level || 'Not specified'}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
 
-    <input
-      type="text"
-      value={skillName}
-      onChange={(event) =>
-        setSkillName(event.target.value)
-      }
-      placeholder="e.g. React"
-    />
-  </div>
+        {(message || error) && (
+          <div
+            className={`profile-message ${
+              error ? 'error' : 'success'
+            }`}
+          >
+            {error || message}
+          </div>
+        )}
 
-  <br />
-
-  <div>
-    <label>Skill Level</label>
-
-    <br />
-
-    <select
-      value={skillLevel}
-      onChange={(event) =>
-        setSkillLevel(event.target.value)
-      }
-    >
-      <option value="BEGINNER">Beginner</option>
-      <option value="INTERMEDIATE">
-        Intermediate
-      </option>
-      <option value="ADVANCED">Advanced</option>
-      <option value="EXPERT">Expert</option>
-    </select>
-  </div>
-
-  <br />
-
-  <button type="submit" disabled={addingSkill}>
-    {addingSkill ? 'Adding...' : 'Add Skill'}
-  </button>
-</form>
-
-<br />
-
-{user.skills.length === 0 ? (
-  <p>No skills added yet.</p>
-) : (
-  <ul>
-    {user.skills.map((item) => (
-      <li key={item.skill.id}>
-        <strong>{item.skill.name}</strong>
-        {item.level ? ` - ${item.level}` : ''}
-      </li>
-    ))}
-  </ul>
-)}
-
-      {user.skills.length === 0 ? (
-        <p>No skills added yet.</p>
-      ) : (
-        <ul>
-          {user.skills.map((item) => (
-            <li key={item.skill.id}>
-              {item.skill.name}
-              {item.level ? ` - ${item.level}` : ''}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+      </div>
+    </main>
   );
 }
 

@@ -68,6 +68,7 @@ model Project {
   owner          User            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   members        ProjectMember[]
   requiredSkills ProjectSkill[]
+  @@index([status])
 }
 
 model ProjectSkill {

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
+
 function CreateProject() {
   const [userId, setUserId] = useState('');
   const [title, setTitle] = useState('');
@@ -10,37 +10,38 @@ function CreateProject() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
- useEffect(() => {
-  async function getSession() {
-    try {
-      const response = await fetch(
-        'http://localhost:3000/api/auth/get-session',
-        {
-          credentials: 'include',
-        },
-      );
 
-      const data = await response.json();
+  useEffect(() => {
+    async function getSession() {
+      try {
+        const response = await fetch(
+          'http://localhost:3000/api/auth/get-session',
+          {
+            credentials: 'include',
+          },
+        );
 
-      if (!response.ok || !data.user) {
-        throw new Error('You are not logged in');
+        const data = await response.json();
+
+        if (!response.ok || !data.user) {
+          throw new Error('You are not logged in');
+        }
+
+        setUserId(data.user.id);
+      } catch (error) {
+        console.error('Failed to get session:', error);
       }
-
-      setUserId(data.user.id);
-    } catch (error) {
-      console.error('Failed to get session:', error);
     }
-  }
 
-  getSession();
-}, []);
- async function handleSubmit(event: any) {
+    getSession();
+  }, []);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setError('');
     setMessage('');
 
-    // Basic validation
     if (!title.trim()) {
       setError('Project title is required.');
       return;
@@ -56,7 +57,10 @@ function CreateProject() {
       return;
     }
 
-   
+    if (!userId) {
+      setError('You must be logged in to create a project.');
+      return;
+    }
 
     const requiredSkills = skills
       .split(',')
@@ -67,41 +71,35 @@ function CreateProject() {
       setLoading(true);
 
       const response = await fetch(
-  `http://localhost:3000/users/${userId}/projects`,
-  {
-    method: 'POST',
+        `http://localhost:3000/users/${userId}/projects`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: title.trim(),
+            description: description.trim(),
+            category: category.trim() || null,
+            teamSize,
+            requiredSkills,
+          }),
+        },
+      );
 
-    credentials: 'include',
-
-    headers: {
-      'Content-Type': 'application/json',
-    },
-
-    body: JSON.stringify({
-      title,
-      description,
-      category: category || null,
-      teamSize,
-      requiredSkills,
-    }),
-  },
-);
+      const data = await response.json();
 
       if (!response.ok) {
-        const data = await response.json();
-
         throw new Error(
           data.message || 'Failed to create project',
         );
       }
 
-      const project = await response.json();
-
       setMessage(
-        `Project "${project.title}" created successfully!`,
+        `Project "${data.title}" created successfully!`,
       );
 
-      // Clear form
       setTitle('');
       setDescription('');
       setCategory('');
@@ -119,112 +117,181 @@ function CreateProject() {
   }
 
   return (
-    <div>
-      <h1>Create Project</h1>
+    <main className="create-project-page">
+      <div className="create-project-container">
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Project Title</label>
+        {/* Header */}
 
-          <br />
+        <header className="create-project-header">
+          <p className="create-project-eyebrow">
+            COLLABCODE • PROJECTS
+          </p>
 
-          <input
-            type="text"
-            value={title}
-            onChange={(event) =>
-              setTitle(event.target.value)
-            }
-          />
+          <h1>Create a Project</h1>
+
+          <p className="create-project-subtitle">
+            Turn an idea into something real. Define your
+            project, find the right skills, and build a team.
+          </p>
+        </header>
+
+        {/* Form */}
+
+        <section className="create-project-card">
+          <div className="create-project-section-heading">
+            <span>01</span>
+
+            <div>
+              <h2>Project Details</h2>
+
+              <p>
+                Tell developers what you are building.
+              </p>
+            </div>
+          </div>
+
+          <form
+            className="create-project-form"
+            onSubmit={handleSubmit}
+          >
+            {/* Project Title */}
+
+            <div className="create-form-group">
+              <label htmlFor="project-title">
+                Project Title
+              </label>
+
+              <input
+                id="project-title"
+                type="text"
+                placeholder="e.g. CollabCode"
+                value={title}
+                onChange={(event) =>
+                  setTitle(event.target.value)
+                }
+              />
+            </div>
+
+            {/* Description */}
+
+            <div className="create-form-group">
+              <label htmlFor="project-description">
+                Description
+              </label>
+
+              <textarea
+                id="project-description"
+                rows={7}
+                placeholder="Describe what you want to build, the problem it solves, and what you hope to achieve..."
+                value={description}
+                onChange={(event) =>
+                  setDescription(event.target.value)
+                }
+              />
+            </div>
+
+            {/* Category + Team Size */}
+
+            <div className="create-project-two-column">
+              <div className="create-form-group">
+                <label htmlFor="project-category">
+                  Category
+                </label>
+
+                <input
+                  id="project-category"
+                  type="text"
+                  placeholder="e.g. Web Development"
+                  value={category}
+                  onChange={(event) =>
+                    setCategory(event.target.value)
+                  }
+                />
+              </div>
+
+              <div className="create-form-group">
+                <label htmlFor="team-size">
+                  Team Size
+                </label>
+
+                <input
+                  id="team-size"
+                  type="number"
+                  min="1"
+                  value={teamSize}
+                  onChange={(event) =>
+                    setTeamSize(Number(event.target.value))
+                  }
+                />
+
+                <small>
+                  Number of people you want on the team.
+                </small>
+              </div>
+            </div>
+
+            {/* Skills */}
+
+            <div className="create-form-group">
+              <label htmlFor="required-skills">
+                Required Skills
+              </label>
+
+              <input
+                id="required-skills"
+                type="text"
+                placeholder="React, TypeScript, Node.js"
+                value={skills}
+                onChange={(event) =>
+                  setSkills(event.target.value)
+                }
+              />
+
+              <small>
+                Separate skills with commas.
+              </small>
+            </div>
+
+            {/* Submit */}
+
+            <div className="create-project-submit">
+              <button
+                className="create-project-button"
+                type="submit"
+                disabled={loading}
+              >
+                {loading
+                  ? 'Creating Project...'
+                  : 'Create Project →'}
+              </button>
+            </div>
+          </form>
+
+          {/* Messages */}
+
+          {message && (
+            <div className="create-project-message success">
+              <strong>{message}</strong>
+            </div>
+          )}
+
+          {error && (
+            <div className="create-project-message error">
+              <strong>Error: {error}</strong>
+            </div>
+          )}
+        </section>
+
+        {/* Small footer note */}
+
+        <div className="create-project-note">
+          <span>COLLABCODE</span>
+          <p>
+            Projects are better when the right people build them together.
+          </p>
         </div>
-
-        <br />
-
-        <div>
-          <label>Description</label>
-
-          <br />
-
-          <textarea
-            value={description}
-            onChange={(event) =>
-              setDescription(event.target.value)
-            }
-          />
-        </div>
-
-        <br />
-
-        <div>
-          <label>Category</label>
-
-          <br />
-
-          <input
-            type="text"
-            value={category}
-            onChange={(event) =>
-              setCategory(event.target.value)
-            }
-          />
-        </div>
-
-        <br />
-
-        <div>
-          <label>Team Size</label>
-
-          <br />
-
-          <input
-            type="number"
-            min="1"
-            value={teamSize}
-            onChange={(event) =>
-              setTeamSize(Number(event.target.value))
-            }
-          />
-        </div>
-
-        <br />
-
-        <div>
-          <label>
-            Required Skills
-            <br />
-            <small>Separate skills with commas</small>
-          </label>
-
-          <br />
-
-          <input
-            type="text"
-            placeholder="React, TypeScript, Node.js"
-            value={skills}
-            onChange={(event) =>
-              setSkills(event.target.value)
-            }
-          />
-        </div>
-
-        <br />
-
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating Project...' : 'Create Project'}
-        </button>
-      </form>
-
-      {message && (
-        <p>
-          <strong>{message}</strong>
-        </p>
-      )}
-
-      {error && (
-        <p>
-          <strong>Error: {error}</strong>
-        </p>
-      )}
-    </div>
+      </div>
+    </main>
   );
 }
 

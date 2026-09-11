@@ -3,11 +3,11 @@ import {
   Controller,
   Get,
   Param,
-  Post,
+  Post,Query,
 } from '@nestjs/common';
 
-import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
-
+import { AllowAnonymous,Session} from '@thallesp/nestjs-better-auth';
+import type { UserSession } from '@thallesp/nestjs-better-auth';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 
@@ -16,14 +16,18 @@ export class ProjectsController {
   constructor(
     private readonly projectsService: ProjectsService,
   ) {}
-
+  @AllowAnonymous()
+@Get('countries/:code')
+getCountryInfo(@Param('code') code: string) {
+  return this.projectsService.getCountryInfo(code);
+}
   // Public: anyone can view projects
   @AllowAnonymous()
-  @Get('projects')
-  getAllProjects() {
-    return this.projectsService.getAllProjects();
-  }
-
+@Get('projects')
+getAllProjects(@Query('status') status?: string) {
+  return this.projectsService.getAllProjects(status);
+}
+  
   // Public: anyone can view project details
   @AllowAnonymous()
   @Get('projects/:id')
@@ -33,15 +37,15 @@ export class ProjectsController {
 
   // Protected: create a project
   @Post('users/:userId/projects')
-  createProject(
-    @Param('userId') userId: string,
-    @Body() createProjectDto: CreateProjectDto,
-  ) {
-    return this.projectsService.createProject(
-      userId,
-      createProjectDto,
-    );
-  }
+createProject(
+  @Session() session: UserSession,
+  @Body() createProjectDto: CreateProjectDto,
+) {
+  return this.projectsService.createProject(
+    session.user.id,
+    createProjectDto,
+  );
+}
 
   // Public: view project members
   @AllowAnonymous()

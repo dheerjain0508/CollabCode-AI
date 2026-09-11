@@ -22,7 +22,6 @@ function Dashboard() {
         setLoading(true);
         setError('');
 
-        // Get the currently logged-in user
         const sessionResponse = await fetch(
           'http://localhost:3000/api/auth/get-session',
           {
@@ -37,10 +36,8 @@ function Dashboard() {
         }
 
         const currentUserId = sessionData.user.id;
-
         setUserId(currentUserId);
 
-        // Get all projects
         const projectsResponse = await fetch(
           'http://localhost:3000/projects',
           {
@@ -54,17 +51,12 @@ function Dashboard() {
 
         const projectsData = await projectsResponse.json();
 
-        // Keep only projects created by the logged-in user
-        console.log('Current User ID:', currentUserId);
-            console.log('All Projects:', projectsData);
+        const myProjects = projectsData.filter(
+          (project: Project & { ownerId: string }) =>
+            project.ownerId === currentUserId,
+        );
 
-            const myProjects = projectsData.filter(
-                (project: any) => project.ownerId === currentUserId,
-                );
-
-console.log('My Projects:', myProjects);
-
-setProjects(myProjects);
+        setProjects(myProjects);
       } catch (err) {
         setError(
           err instanceof Error
@@ -80,65 +72,121 @@ setProjects(myProjects);
   }, []);
 
   if (loading) {
-    return <p className="loading-text">Loading dashboard...</p>;
+    return (
+      <main className="dashboard-page">
+        <p className="loading-text">Loading dashboard...</p>
+      </main>
+    );
   }
 
   if (error) {
-    return <h1>Error: {error}</h1>;
+    return (
+      <main className="dashboard-page">
+        <div className="dashboard-container">
+          <div className="dashboard-message">
+            Error: {error}
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (
-    <div>
-      <h1>My Dashboard</h1>
+    <main className="dashboard-page">
+      <div className="dashboard-container">
 
-      <p>
-        Logged in as: <strong>{userId}</strong>
-      </p>
+        <header className="dashboard-header">
+          <div>
+            <p className="dashboard-eyebrow">
+              COLLABCODE • DASHBOARD
+            </p>
 
-      <Link to="/create-project">
-        <button>Create New Project</button>
-      </Link>
+            <h1>My Dashboard</h1>
 
-      <h2>My Projects</h2>
+            <p className="dashboard-subtitle">
+              Keep track of the projects you are building.
+            </p>
+          </div>
 
-      {projects.length === 0 ? (
-        <p>You have not created any projects yet.</p>
-      ) : (
-        <div>
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              style={{
-                border: '1px solid black',
-                padding: '15px',
-                marginTop: '10px',
-              }}
-            >
-              <h3>{project.title}</h3>
+          <Link
+            to="/create-project"
+            className="dashboard-create-button"
+          >
+            Create New Project
+          </Link>
+        </header>
 
-              <p>{project.description}</p>
+        <section className="dashboard-account">
+          <span>ACCOUNT</span>
+          <p>{userId}</p>
+        </section>
 
+        <section className="dashboard-project-section">
+          <div className="dashboard-section-heading">
+            <div>
+              <span>01</span>
+              <h2>My Projects</h2>
+            </div>
+
+            <p>{projects.length} project(s)</p>
+          </div>
+
+          {projects.length === 0 ? (
+            <div className="dashboard-empty">
+              <h3>No projects yet.</h3>
               <p>
-                <strong>Category:</strong>{' '}
-                {project.category || 'Not specified'}
+                Create your first project and start building
+                with other developers.
               </p>
 
-              <p>
-                <strong>Status:</strong> {project.status}
-              </p>
-
-              <p>
-                <strong>Team Size:</strong> {project.teamSize}
-              </p>
-
-              <Link to={`/projects/${project.id}`}>
-                View Project
+              <Link to="/create-project">
+                Create your first project
               </Link>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+          ) : (
+            <div className="dashboard-projects">
+              {projects.map((project) => (
+                <article
+                  className="dashboard-project-card"
+                  key={project.id}
+                >
+                  <div className="project-card-top">
+                    <span className="project-status">
+                      {project.status}
+                    </span>
+
+                    <span className="project-team">
+                      Team · {project.teamSize}
+                    </span>
+                  </div>
+
+                  <h3>{project.title}</h3>
+
+                  <p className="project-description">
+                    {project.description}
+                  </p>
+
+                  <div className="project-meta">
+                    <span>
+                      Category:{' '}
+                      {project.category || 'Not specified'}
+                    </span>
+                  </div>
+
+                  <Link
+                    to={`/projects/${project.id}`}
+                    className="project-link"
+                  >
+                    View Project →
+                  </Link>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+
+      </div>
+    </main>
   );
 }
 

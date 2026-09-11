@@ -1,16 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 @Injectable()
 export class ProjectsService {
-  constructor(private readonly prisma: PrismaService) {}
+constructor(
+  private readonly prisma: PrismaService,
+  private readonly notificationsGateway: NotificationsGateway,
+) {}
 
   async createProject(
-    ownerId: string,
-    createProjectDto: CreateProjectDto,
-  ) {
-    const user = await this.prisma.user.findUnique({
+  ownerId: string,
+  createProjectDto: CreateProjectDto,
+) {
+  return this.prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
       where: { id: ownerId },
     });
 
@@ -20,43 +24,62 @@ export class ProjectsService {
 
     const { requiredSkills, ...projectData } = createProjectDto;
 
-    const skills = await Promise.all(
-      requiredSkills.map(async (skillName) => {
-        return this.prisma.skill.upsert({
-          where: {
-            name: skillName,
-          },
-          update: {},
-          create: {
-            name: skillName,
-          },
-        });
-      }),
-    );
+    const skills: { id: string; name: string }[] = [];
 
-    return this.prisma.project.create({
-      data: {
-        ...projectData,
-        ownerId,
-
-        requiredSkills: {
-          create: skills.map((skill) => ({
-            skillId: skill.id,
-          })),
+    for (const skillName of requiredSkills) {
+      const skill = await tx.skill.upsert({
+        where: {
+          name: skillName,
         },
-      },
+        update: {},
+        create: {
+          name: skillName,
+        },
+      });
+
+      skills.push(skill);
+    }
+
+    const project = await tx.project.create({
+  data: {
+    ...projectData,
+    ownerId,
+
+    requiredSkills: {
+      create: skills.map((skill) => ({
+        skillId: skill.id,
+      })),
+    },
+  },
+  include: {
+    owner: true,
+    requiredSkills: {
       include: {
-        owner: true,
-        requiredSkills: {
-          include: {
-            skill: true,
-          },
-        },
+        skill: true,
       },
-    });
-  }
-  async getAllProjects() {
+    },
+  },
+});
+
+this.notificationsGateway.notifyProjectUpdate(
+  project.id,
+  {
+    type: 'PROJECT_CREATED',
+    project,
+  },
+);
+
+return project;
+  });
+}
+  async getAllProjects(status?: string) {
   return this.prisma.project.findMany({
+    where: status
+      ? {
+          status,
+        }
+      : undefined,
+
     include: {
       owner: {
         select: {
@@ -162,5 +185,16 @@ async getProjectMembers(projectId: string) {
       },
     },
   });
+}
+async getCountryInfo(countryCode: string) {
+  const response = await fetch(
+    `https://countries.dev/alpha/${countryCode}`,
+  );
+
+  if (!response.ok) {
+    throw new NotFoundException('Country not found');
+  }
+
+  return response.json();
 }
 }

@@ -27,13 +27,11 @@ type Project = {
   category: string | null;
   teamSize: number;
   status: string;
-
   owner: {
     id: string;
     name: string | null;
     email: string;
   };
-
   requiredSkills: Skill[];
   applications: Application[];
 };
@@ -139,11 +137,9 @@ function ProjectDetails() {
         {
           method: 'POST',
           credentials: 'include',
-
           headers: {
             'Content-Type': 'application/json',
           },
-
           body: JSON.stringify({
             message: applicationMessage.trim(),
           }),
@@ -207,11 +203,9 @@ function ProjectDetails() {
         {
           method: 'PATCH',
           credentials: 'include',
-
           headers: {
             'Content-Type': 'application/json',
           },
-
           body: JSON.stringify({
             status,
           }),
@@ -279,6 +273,7 @@ function ProjectDetails() {
       <main className="page">
         <div className="empty-state">
           <h2>Project not found</h2>
+
           <Link
             to="/projects"
             className="btn btn-primary"
@@ -294,49 +289,28 @@ function ProjectDetails() {
 
   return (
     <main className="page">
+      {/* Back */}
 
-      {/* ---------- Back ---------- */}
-
-      <div style={{ marginBottom: '32px' }}>
-        <Link
-          to="/projects"
-          className="muted"
-          style={{ fontSize: '14px' }}
-        >
+      <div className="project-details-back">
+        <Link to="/projects">
           ← Back to Projects
         </Link>
       </div>
 
-      {/* ---------- Project Header ---------- */}
+      {/* Project Header */}
 
-      <section className="card">
-
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: '24px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <div style={{ flex: 1 }}>
+      <section className="project-details-card project-hero-card">
+        <div className="project-hero-top">
+          <div className="project-hero-content">
             <div className="section-label">
               PROJECT
             </div>
 
-            <h1 style={{ marginBottom: '20px' }}>
+            <h1 className="project-details-title">
               {project.title}
             </h1>
 
-            <p
-              style={{
-                maxWidth: '750px',
-                margin: 0,
-                color: 'var(--muted)',
-                fontSize: '17px',
-              }}
-            >
+            <p className="project-details-description">
               {project.description}
             </p>
           </div>
@@ -348,27 +322,13 @@ function ProjectDetails() {
 
         {/* Project information */}
 
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '35px',
-            marginTop: '40px',
-            paddingTop: '25px',
-            borderTop: '1px solid var(--border)',
-          }}
-        >
+        <div className="project-info-row">
           <div>
             <span className="muted">
               Category
             </span>
 
-            <strong
-              style={{
-                display: 'block',
-                marginTop: '5px',
-              }}
-            >
+            <strong className="project-info-value">
               {project.category ?? 'Not specified'}
             </strong>
           </div>
@@ -378,12 +338,7 @@ function ProjectDetails() {
               Team Size
             </span>
 
-            <strong
-              style={{
-                display: 'block',
-                marginTop: '5px',
-              }}
-            >
+            <strong className="project-info-value">
               {project.teamSize}
             </strong>
           </div>
@@ -393,30 +348,19 @@ function ProjectDetails() {
               Status
             </span>
 
-            <strong
-              style={{
-                display: 'block',
-                marginTop: '5px',
-              }}
-            >
+            <strong className="project-info-value">
               {project.status}
             </strong>
           </div>
         </div>
-
       </section>
 
-      {/* ---------- Two Column Content ---------- */}
+      {/* Owner + Skills */}
 
-      <div
-        className="grid grid-2"
-        style={{ marginTop: '24px' }}
-      >
+      <div className="project-details-grid">
+        {/* Owner */}
 
-        {/* ---------- Owner ---------- */}
-
-        <section className="card">
-
+        <section className="project-details-card">
           <div className="section-label">
             PROJECT OWNER
           </div>
@@ -432,13 +376,11 @@ function ProjectDetails() {
           <p className="muted">
             {project.owner.email}
           </p>
-
         </section>
 
-        {/* ---------- Skills ---------- */}
+        {/* Skills */}
 
-        <section className="card">
-
+        <section className="project-details-card">
           <div className="section-label">
             REQUIREMENTS
           </div>
@@ -461,19 +403,13 @@ function ProjectDetails() {
               ))}
             </div>
           )}
-
         </section>
-
       </div>
 
-      {/* ---------- Apply ---------- */}
+      {/* Apply */}
 
       {!isOwner && (
-        <section
-          className="card"
-          style={{ marginTop: '24px' }}
-        >
-
+        <section className="project-details-card project-apply-card">
           <div className="section-label">
             JOIN THE PROJECT
           </div>
@@ -486,13 +422,10 @@ function ProjectDetails() {
           </p>
 
           <form
-            className="form"
+            className="form project-apply-form"
             onSubmit={handleApply}
-            style={{ marginTop: '28px' }}
           >
-
             <div className="form-group">
-
               <label htmlFor="application-message">
                 Message
               </label>
@@ -508,7 +441,6 @@ function ProjectDetails() {
                 placeholder="Tell the project owner why you'd be a good fit..."
                 rows={6}
               />
-
             </div>
 
             <div>
@@ -522,7 +454,6 @@ function ProjectDetails() {
                   : 'Apply to Project →'}
               </button>
             </div>
-
           </form>
 
           {applicationStatus && (
@@ -539,17 +470,13 @@ function ProjectDetails() {
               {applicationStatus}
             </div>
           )}
-
         </section>
       )}
 
-      {/* ---------- Applications ---------- */}
+      {/* Applications */}
 
       {isOwner && (
-        <section
-          style={{ marginTop: '70px' }}
-        >
-
+        <section className="applications-section">
           <div className="page-header">
             <div className="section-label">
               TEAM MANAGEMENT
@@ -573,41 +500,23 @@ function ProjectDetails() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-2">
-
+            <div className="applications-grid">
               {project.applications.map(
                 (application) => (
                   <article
-                    className="card"
+                    className="project-details-card application-card"
                     key={application.id}
                   >
-
                     {/* Applicant */}
 
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                        gap: '15px',
-                      }}
-                    >
-
+                    <div className="application-header">
                       <div>
-                        <h3
-                          style={{
-                            marginBottom: '5px',
-                            fontSize: '20px',
-                          }}
-                        >
+                        <h3>
                           {application.applicant.name ??
                             'Unknown'}
                         </h3>
 
-                        <p
-                          className="muted"
-                          style={{ margin: 0 }}
-                        >
+                        <p className="muted">
                           {application.applicant.email}
                         </p>
                       </div>
@@ -625,19 +534,11 @@ function ProjectDetails() {
                       >
                         {application.status}
                       </span>
-
                     </div>
 
                     {/* Message */}
 
-                    <div
-                      style={{
-                        marginTop: '25px',
-                        paddingTop: '20px',
-                        borderTop:
-                          '1px solid var(--border)',
-                      }}
-                    >
+                    <div className="application-message">
                       <span className="muted">
                         Application message
                       </span>
@@ -652,14 +553,7 @@ function ProjectDetails() {
 
                     {application.status ===
                       'PENDING' && (
-                      <div
-                        style={{
-                          display: 'flex',
-                          gap: '10px',
-                          marginTop: '20px',
-                        }}
-                      >
-
+                      <div className="application-actions">
                         <button
                           className="btn btn-success"
                           onClick={() =>
@@ -683,20 +577,15 @@ function ProjectDetails() {
                         >
                           Reject
                         </button>
-
                       </div>
                     )}
-
                   </article>
                 ),
               )}
-
             </div>
           )}
-
         </section>
       )}
-
     </main>
   );
 }
