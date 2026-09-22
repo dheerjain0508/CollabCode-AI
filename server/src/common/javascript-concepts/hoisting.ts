@@ -1,17 +1,20 @@
 export function demonstrateHoisting(): string {
-  const result: string[] = [];
+  const results: string[] = [];
 
-  result.push(hoistedFunction());
+  // Function declaration hoisting
+  results.push(hoistedFunction());
 
   function hoistedFunction(): string {
-    return 'Function declarations are hoisted';
+    return 'Function declaration was hoisted';
   }
 
-  var message = 'var declaration is hoisted';
+  // var declaration is hoisted, but its assignment happens later.
+  // @ts-expect-error TS2454: intentional hoisting demonstration
+  results.push(`Before assignment: ${hoistedVariable}`);
 
-  if (message) {
-    result.push(message);
-  }
+  var hoistedVariable = 'var assignment completed';
 
-  return result.join(' | ');
+  results.push(hoistedVariable);
+
+  return results.join(' | ');
 }
