@@ -2,8 +2,11 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
-  Post,Query,
+  Post,
+  Query,
 } from '@nestjs/common';
 
 import { AllowAnonymous,Session} from '@thallesp/nestjs-better-auth';
@@ -24,6 +27,7 @@ getCountryInfo(@Param('code') code: string) {
   // Public: anyone can view projects
  // Public: anyone can view projects
 @AllowAnonymous()
+@HttpCode(HttpStatus.OK)
 @Get('projects')
 getAllProjects(@Query('status') status?: string) {
   return this.projectsService.getAllProjects(status);
@@ -45,6 +49,7 @@ getProjectById(@Param('id') id: string) {
 
   // Protected: create a project
   @Post('users/:userId/projects')
+  @HttpCode(HttpStatus.CREATED)
 createProject(
   @Session() session: UserSession,
   @Body() createProjectDto: CreateProjectDto,

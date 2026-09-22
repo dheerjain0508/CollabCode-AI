@@ -14,7 +14,7 @@ import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ApplicationsModule } from './applications/applications.module';
 import { auth } from './auth';
-
+import { JavascriptConceptsController } from './common/javascript-concepts/javascript-concepts.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AiAnalysesModule } from './ai-analyses/ai-analyses.module';
 import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
@@ -45,7 +45,7 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
     AiAssistantModule,
   ],
 
-  controllers: [AppController],
+  controllers: [AppController,JavascriptConceptsController],
   providers: [AppService, NotificationsGateway],
 })
 export class AppModule implements NestModule {
