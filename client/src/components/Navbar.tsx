@@ -12,7 +12,7 @@ function Navbar() {
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `nav-link ${isActive ? 'active' : ''}`
+              `nav-link ${isActive ? 'active' : ''}`  
             }
           >
             Home

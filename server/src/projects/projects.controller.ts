@@ -22,18 +22,26 @@ getCountryInfo(@Param('code') code: string) {
   return this.projectsService.getCountryInfo(code);
 }
   // Public: anyone can view projects
-  @AllowAnonymous()
+ // Public: anyone can view projects
+@AllowAnonymous()
 @Get('projects')
 getAllProjects(@Query('status') status?: string) {
   return this.projectsService.getAllProjects(status);
 }
-  
-  // Public: anyone can view project details
-  @AllowAnonymous()
-  @Get('projects/:id')
-  getProjectById(@Param('id') id: string) {
-    return this.projectsService.getProjectById(id);
-  }
+
+// SQL JOIN: projects with their owners
+@AllowAnonymous()
+@Get('projects-with-owners')
+getProjectsWithOwners() {
+  return this.projectsService.getProjectsWithOwners();
+}
+
+// Public: anyone can view project details
+@AllowAnonymous()
+@Get('projects/:id')
+getProjectById(@Param('id') id: string) {
+  return this.projectsService.getProjectById(id);
+}
 
   // Protected: create a project
   @Post('users/:userId/projects')

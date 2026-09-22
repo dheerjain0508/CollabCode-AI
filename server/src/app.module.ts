@@ -1,7 +1,11 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
 
 import { AuthModule } from '@thallesp/nestjs-better-auth';
-
+import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 import { SkillsModule } from './skills/skills.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -44,4 +48,10 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
   controllers: [AppController],
   providers: [AppService, NotificationsGateway],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(RequestLoggerMiddleware)
+      .forRoutes('*');
+  }
+}
