@@ -14,7 +14,8 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model Application
- * 
+ * SQL (Postgres) Relational Model: Application
+ * Foreign keys `applicantId` -> `User.id` and `projectId` -> `Project.id` enable multi-table SQL JOINs.
  */
 export type ApplicationModel = runtime.Types.Result.DefaultSelection<Prisma.$ApplicationPayload>
 

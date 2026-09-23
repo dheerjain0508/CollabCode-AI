@@ -14,7 +14,8 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model ProjectSkill
- * 
+ * SQL (Postgres) Relational Model: ProjectSkill
+ * Junction table executing PostgreSQL MANY-TO-MANY INNER JOIN between Project and Skill tables.
  */
 export type ProjectSkillModel = runtime.Types.Result.DefaultSelection<Prisma.$ProjectSkillPayload>
 

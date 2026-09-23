@@ -18,6 +18,7 @@ import { JavascriptConceptsController } from './common/javascript-concepts/javas
 import { MongooseModule } from '@nestjs/mongoose';
 import { AiAnalysesModule } from './ai-analyses/ai-analyses.module';
 import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
+import { SqlJoinsModule } from './sql-joins/sql-joins.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
 
 @Module({
@@ -27,6 +28,7 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
     ProjectsModule,
     ApplicationsModule,
     SkillsModule,
+    SqlJoinsModule,
 
     MongooseModule.forRoot(process.env.MONGODB_URI!),
     AiAnalysesModule,
@@ -45,7 +47,7 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
     AiAssistantModule,
   ],
 
-  controllers: [AppController,JavascriptConceptsController],
+  controllers: [AppController, JavascriptConceptsController],
   providers: [AppService, NotificationsGateway],
 })
 export class AppModule implements NestModule {

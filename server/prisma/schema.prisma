@@ -8,6 +8,12 @@ datasource db {
   provider = "postgresql"
 }
 
+/// SQL (Postgres) Relational Model: User
+/// Demonstrates PostgreSQL SQL JOIN relationships:
+/// 1. ONE-TO-ONE LEFT JOIN with Profile (`User LEFT JOIN Profile ON User.id = Profile.userId`)
+/// 2. ONE-TO-MANY INNER JOIN with Project as Owner (`User INNER JOIN Project ON User.id = Project.ownerId`)
+/// 3. ONE-TO-MANY INNER JOIN with Application (`User INNER JOIN Application ON User.id = Application.applicantId`)
+/// 4. MANY-TO-MANY JOIN via UserSkill JOIN table (`User INNER JOIN UserSkill INNER JOIN Skill`)
 model User {
   id            String          @id @default(cuid())
   email         String          @unique
@@ -25,6 +31,8 @@ model User {
   sessions      Session[]
 }
 
+/// SQL (Postgres) Relational Model: Profile
+/// Foreign key constraint `userId` maps to `User.id` for SQL LEFT JOIN queries.
 model Profile {
   id              String   @id @default(cuid())
   userId          String   @unique
@@ -37,6 +45,8 @@ model Profile {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+/// SQL (Postgres) Relational Model: Skill
+/// Participates in MANY-TO-MANY SQL JOINs via `UserSkill` and `ProjectSkill` join tables.
 model Skill {
   id       String         @id @default(cuid())
   name     String         @unique
@@ -44,6 +54,8 @@ model Skill {
   users    UserSkill[]
 }
 
+/// SQL (Postgres) Relational Model: UserSkill
+/// Junction table executing PostgreSQL MANY-TO-MANY INNER JOIN between User and Skill tables.
 model UserSkill {
   userId  String
   skillId String
@@ -54,6 +66,8 @@ model UserSkill {
   @@id([userId, skillId])
 }
 
+/// SQL (Postgres) Relational Model: Project
+/// Foreign key `ownerId` -> `User.id` enables SQL INNER JOIN and LEFT JOIN queries on Postgres.
 model Project {
   id             String          @id @default(cuid())
   title          String
@@ -70,8 +84,11 @@ model Project {
   requiredSkills ProjectSkill[]
 
   @@index([status])
+  @@index([ownerId])
 }
 
+/// SQL (Postgres) Relational Model: ProjectSkill
+/// Junction table executing PostgreSQL MANY-TO-MANY INNER JOIN between Project and Skill tables.
 model ProjectSkill {
   projectId String
   skillId   String
@@ -81,6 +98,8 @@ model ProjectSkill {
   @@id([projectId, skillId])
 }
 
+/// SQL (Postgres) Relational Model: Application
+/// Foreign keys `applicantId` -> `User.id` and `projectId` -> `Project.id` enable multi-table SQL JOINs.
 model Application {
   id          String   @id @default(cuid())
   message     String?
@@ -95,6 +114,8 @@ model Application {
   @@unique([applicantId, projectId])
 }
 
+/// SQL (Postgres) Relational Model: ProjectMember
+/// Junction table executing PostgreSQL MANY-TO-MANY INNER JOIN between Project and User tables.
 model ProjectMember {
   projectId String
   userId    String

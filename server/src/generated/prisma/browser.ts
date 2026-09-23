@@ -19,42 +19,54 @@ export * as $Enums from './enums.js'
 export * from './enums.js';
 /**
  * Model User
- * 
+ * SQL (Postgres) Relational Model: User
+ * Demonstrates PostgreSQL SQL JOIN relationships:
+ * 1. ONE-TO-ONE LEFT JOIN with Profile (`User LEFT JOIN Profile ON User.id = Profile.userId`)
+ * 2. ONE-TO-MANY INNER JOIN with Project as Owner (`User INNER JOIN Project ON User.id = Project.ownerId`)
+ * 3. ONE-TO-MANY INNER JOIN with Application (`User INNER JOIN Application ON User.id = Application.applicantId`)
+ * 4. MANY-TO-MANY JOIN via UserSkill JOIN table (`User INNER JOIN UserSkill INNER JOIN Skill`)
  */
 export type User = Prisma.UserModel
 /**
  * Model Profile
- * 
+ * SQL (Postgres) Relational Model: Profile
+ * Foreign key constraint `userId` maps to `User.id` for SQL LEFT JOIN queries.
  */
 export type Profile = Prisma.ProfileModel
 /**
  * Model Skill
- * 
+ * SQL (Postgres) Relational Model: Skill
+ * Participates in MANY-TO-MANY SQL JOINs via `UserSkill` and `ProjectSkill` join tables.
  */
 export type Skill = Prisma.SkillModel
 /**
  * Model UserSkill
- * 
+ * SQL (Postgres) Relational Model: UserSkill
+ * Junction table executing PostgreSQL MANY-TO-MANY INNER JOIN between User and Skill tables.
  */
 export type UserSkill = Prisma.UserSkillModel
 /**
  * Model Project
- * 
+ * SQL (Postgres) Relational Model: Project
+ * Foreign key `ownerId` -> `User.id` enables SQL INNER JOIN and LEFT JOIN queries on Postgres.
  */
 export type Project = Prisma.ProjectModel
 /**
  * Model ProjectSkill
- * 
+ * SQL (Postgres) Relational Model: ProjectSkill
+ * Junction table executing PostgreSQL MANY-TO-MANY INNER JOIN between Project and Skill tables.
  */
 export type ProjectSkill = Prisma.ProjectSkillModel
 /**
  * Model Application
- * 
+ * SQL (Postgres) Relational Model: Application
+ * Foreign keys `applicantId` -> `User.id` and `projectId` -> `Project.id` enable multi-table SQL JOINs.
  */
 export type Application = Prisma.ApplicationModel
 /**
  * Model ProjectMember
- * 
+ * SQL (Postgres) Relational Model: ProjectMember
+ * Junction table executing PostgreSQL MANY-TO-MANY INNER JOIN between Project and User tables.
  */
 export type ProjectMember = Prisma.ProjectMemberModel
 /**

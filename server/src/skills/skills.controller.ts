@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { AddSkillDto } from './dto/add-skill.dto';
 
@@ -7,6 +7,7 @@ export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   addSkill(
     @Param('userId') userId: string,
     @Body() addSkillDto: AddSkillDto,

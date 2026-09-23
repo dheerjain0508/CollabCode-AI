@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   Post,
 } from '@nestjs/common';
 import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
@@ -14,6 +16,7 @@ export class AiAssistantController {
 
   @AllowAnonymous()
   @Post('analyze')
+  @HttpCode(HttpStatus.OK)
   analyzeProject(
     @Body()
     body: {

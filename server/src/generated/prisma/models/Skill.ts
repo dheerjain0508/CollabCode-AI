@@ -14,7 +14,8 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model Skill
- * 
+ * SQL (Postgres) Relational Model: Skill
+ * Participates in MANY-TO-MANY SQL JOINs via `UserSkill` and `ProjectSkill` join tables.
  */
 export type SkillModel = runtime.Types.Result.DefaultSelection<Prisma.$SkillPayload>
 
@@ -158,15 +159,15 @@ export type SkillWhereInput = {
   NOT?: Prisma.SkillWhereInput | Prisma.SkillWhereInput[]
   id?: Prisma.StringFilter<"Skill"> | string
   name?: Prisma.StringFilter<"Skill"> | string
-  users?: Prisma.UserSkillListRelationFilter
   projects?: Prisma.ProjectSkillListRelationFilter
+  users?: Prisma.UserSkillListRelationFilter
 }
 
 export type SkillOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  users?: Prisma.UserSkillOrderByRelationAggregateInput
   projects?: Prisma.ProjectSkillOrderByRelationAggregateInput
+  users?: Prisma.UserSkillOrderByRelationAggregateInput
 }
 
 export type SkillWhereUniqueInput = Prisma.AtLeast<{
@@ -175,8 +176,8 @@ export type SkillWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.SkillWhereInput | Prisma.SkillWhereInput[]
   OR?: Prisma.SkillWhereInput[]
   NOT?: Prisma.SkillWhereInput | Prisma.SkillWhereInput[]
-  users?: Prisma.UserSkillListRelationFilter
   projects?: Prisma.ProjectSkillListRelationFilter
+  users?: Prisma.UserSkillListRelationFilter
 }, "id" | "name">
 
 export type SkillOrderByWithAggregationInput = {
@@ -198,29 +199,29 @@ export type SkillScalarWhereWithAggregatesInput = {
 export type SkillCreateInput = {
   id?: string
   name: string
-  users?: Prisma.UserSkillCreateNestedManyWithoutSkillInput
   projects?: Prisma.ProjectSkillCreateNestedManyWithoutSkillInput
+  users?: Prisma.UserSkillCreateNestedManyWithoutSkillInput
 }
 
 export type SkillUncheckedCreateInput = {
   id?: string
   name: string
-  users?: Prisma.UserSkillUncheckedCreateNestedManyWithoutSkillInput
   projects?: Prisma.ProjectSkillUncheckedCreateNestedManyWithoutSkillInput
+  users?: Prisma.UserSkillUncheckedCreateNestedManyWithoutSkillInput
 }
 
 export type SkillUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  users?: Prisma.UserSkillUpdateManyWithoutSkillNestedInput
   projects?: Prisma.ProjectSkillUpdateManyWithoutSkillNestedInput
+  users?: Prisma.UserSkillUpdateManyWithoutSkillNestedInput
 }
 
 export type SkillUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  users?: Prisma.UserSkillUncheckedUpdateManyWithoutSkillNestedInput
   projects?: Prisma.ProjectSkillUncheckedUpdateManyWithoutSkillNestedInput
+  users?: Prisma.UserSkillUncheckedUpdateManyWithoutSkillNestedInput
 }
 
 export type SkillCreateManyInput = {
@@ -372,13 +373,13 @@ export type SkillUncheckedUpdateWithoutProjectsInput = {
  */
 
 export type SkillCountOutputType = {
-  users: number
   projects: number
+  users: number
 }
 
 export type SkillCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  users?: boolean | SkillCountOutputTypeCountUsersArgs
   projects?: boolean | SkillCountOutputTypeCountProjectsArgs
+  users?: boolean | SkillCountOutputTypeCountUsersArgs
 }
 
 /**
@@ -394,23 +395,23 @@ export type SkillCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
 /**
  * SkillCountOutputType without action
  */
-export type SkillCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserSkillWhereInput
+export type SkillCountOutputTypeCountProjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProjectSkillWhereInput
 }
 
 /**
  * SkillCountOutputType without action
  */
-export type SkillCountOutputTypeCountProjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ProjectSkillWhereInput
+export type SkillCountOutputTypeCountUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserSkillWhereInput
 }
 
 
 export type SkillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  users?: boolean | Prisma.Skill$usersArgs<ExtArgs>
   projects?: boolean | Prisma.Skill$projectsArgs<ExtArgs>
+  users?: boolean | Prisma.Skill$usersArgs<ExtArgs>
   _count?: boolean | Prisma.SkillCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["skill"]>
 
@@ -431,8 +432,8 @@ export type SkillSelectScalar = {
 
 export type SkillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["skill"]>
 export type SkillInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  users?: boolean | Prisma.Skill$usersArgs<ExtArgs>
   projects?: boolean | Prisma.Skill$projectsArgs<ExtArgs>
+  users?: boolean | Prisma.Skill$usersArgs<ExtArgs>
   _count?: boolean | Prisma.SkillCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SkillIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -441,8 +442,8 @@ export type SkillIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $SkillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Skill"
   objects: {
-    users: Prisma.$UserSkillPayload<ExtArgs>[]
     projects: Prisma.$ProjectSkillPayload<ExtArgs>[]
+    users: Prisma.$UserSkillPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -841,8 +842,8 @@ readonly fields: SkillFieldRefs;
  */
 export interface Prisma__SkillClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  users<T extends Prisma.Skill$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Skill$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   projects<T extends Prisma.Skill$projectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Skill$projectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProjectSkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  users<T extends Prisma.Skill$usersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Skill$usersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSkillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1267,30 +1268,6 @@ export type SkillDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * Skill.users
- */
-export type Skill$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserSkill
-   */
-  select?: Prisma.UserSkillSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserSkill
-   */
-  omit?: Prisma.UserSkillOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserSkillInclude<ExtArgs> | null
-  where?: Prisma.UserSkillWhereInput
-  orderBy?: Prisma.UserSkillOrderByWithRelationInput | Prisma.UserSkillOrderByWithRelationInput[]
-  cursor?: Prisma.UserSkillWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserSkillScalarFieldEnum | Prisma.UserSkillScalarFieldEnum[]
-}
-
-/**
  * Skill.projects
  */
 export type Skill$projectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1312,6 +1289,30 @@ export type Skill$projectsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.ProjectSkillScalarFieldEnum | Prisma.ProjectSkillScalarFieldEnum[]
+}
+
+/**
+ * Skill.users
+ */
+export type Skill$usersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserSkill
+   */
+  select?: Prisma.UserSkillSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserSkill
+   */
+  omit?: Prisma.UserSkillOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserSkillInclude<ExtArgs> | null
+  where?: Prisma.UserSkillWhereInput
+  orderBy?: Prisma.UserSkillOrderByWithRelationInput | Prisma.UserSkillOrderByWithRelationInput[]
+  cursor?: Prisma.UserSkillWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserSkillScalarFieldEnum | Prisma.UserSkillScalarFieldEnum[]
 }
 
 /**

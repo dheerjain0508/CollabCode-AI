@@ -14,7 +14,8 @@ import type * as Prisma from "../internal/prismaNamespace.js"
 
 /**
  * Model Profile
- * 
+ * SQL (Postgres) Relational Model: Profile
+ * Foreign key constraint `userId` maps to `User.id` for SQL LEFT JOIN queries.
  */
 export type ProfileModel = runtime.Types.Result.DefaultSelection<Prisma.$ProfilePayload>
 

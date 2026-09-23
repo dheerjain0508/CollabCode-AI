@@ -1,75 +1,39 @@
-# React + TypeScript + Vite
+# CollabCode Client - React + TypeScript Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend client application for CollabCode, built using React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Technical Features
 
-## React Compiler
+### 1. PostgreSQL Schema Synchronization (`prisma/schema.prisma`)
+The client includes the complete PostgreSQL relational schema definition matching backend data models (User, Profile, Project, Application, Skill, UserSkill, ProjectSkill, ProjectMember, Session, Account, Verification) with explicit PostgreSQL SQL JOIN docstrings.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Centralized HTTP Status Code Handler (`src/utils/apiClient.ts`)
+Inspects and processes standard HTTP status codes:
+- **200 OK / 201 Created / 204 No Content**: Success processing
+- **400 Bad Request**: Input validation error handling
+- **401 Unauthorized**: Session expiration warning
+- **403 Forbidden**: Access permission error
+- **404 Not Found**: Resource non-existence state
+- **409 Conflict**: Unique constraint collision warning
+- **422 Unprocessable Entity**: Business validation failure
+- **500 Internal Error / 503 Service Unavailable**: Operational error state
 
-## Expanding the ESLint configuration
+### 3. Client JavaScript Hoisting Utility (`src/utils/jsHoisting.ts`)
+Demonstrates function hoisting, `var` hoisting, and Temporal Dead Zone (TDZ) handling in browser JavaScript engines.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Development Commands
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+```bash
+# Install dependencies
+npm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Run development server
+npm run dev
 
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+# Build production bundle
+npm run build
 ```
