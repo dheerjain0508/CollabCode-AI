@@ -3,6 +3,7 @@ import {
   Module,
   NestModule,
 } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
@@ -19,6 +20,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AiAnalysesModule } from './ai-analyses/ai-analyses.module';
 import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { SqlJoinsModule } from './sql-joins/sql-joins.module';
+import { HttpStatusCodesModule } from './common/http-status-codes/http-status-codes.module';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { NotificationsGateway } from './notifications/notifications.gateway';
 
 @Module({
@@ -29,6 +32,7 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
     ApplicationsModule,
     SkillsModule,
     SqlJoinsModule,
+    HttpStatusCodesModule,
 
     MongooseModule.forRoot(process.env.MONGODB_URI!),
     AiAnalysesModule,
@@ -48,7 +52,14 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
   ],
 
   controllers: [AppController, JavascriptConceptsController],
-  providers: [AppService, NotificationsGateway],
+  providers: [
+    AppService,
+    NotificationsGateway,
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
