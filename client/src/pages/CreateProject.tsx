@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function CreateProject() {
+  const navigate = useNavigate();
   const [userId, setUserId] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -105,6 +107,10 @@ function CreateProject() {
       setCategory('');
       setTeamSize(2);
       setSkills('');
+
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
     } catch (err) {
       setError(
         err instanceof Error
